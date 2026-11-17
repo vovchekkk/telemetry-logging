@@ -3,17 +3,12 @@ using Elastic.Ingest.Elasticsearch;
 using Elastic.Ingest.Elasticsearch.DataStreams;
 using Elastic.Serilog.Sinks;
 using Elastic.Transport;
+using OpenTelemetry;
 using OpenTelemetry.Resources;
 using Serilog;
-
 try
 {
     var builder = WebApplication.CreateBuilder(args);
-    
-    builder.Services.AddOpenTelemetry()
-        .ConfigureResource(r => r.AddService("Ave Maria"))
-        .WithLogging()
-        .UseOtlpExporter();
     
     Log.Logger = new LoggerConfiguration()
         .ReadFrom.Configuration(builder.Configuration)
@@ -43,10 +38,16 @@ try
 
 // Add services to the container.
     builder.Services.AddRazorPages();
+    
+    
+    builder.Services.AddOpenTelemetry()
+        .ConfigureResource(r => r.AddService("Ave Maria"))
+        .WithLogging()
+        .UseOtlpExporter();
 
-    builder.Host.UseSerilog();
+    //builder.Host.UseSerilog();
 
-    builder.Services.AddSerilog(Log.Logger);
+    //builder.Services.AddSerilog(Log.Logger);
     /*
     builder.Services.AddSerilog((services, loggerConfiguration) =>
         loggerConfiguration
@@ -65,7 +66,7 @@ try
 
     app.UseHttpsRedirection();
     app.UseStaticFiles();
-    app.UseSerilogRequestLogging();
+    //app.UseSerilogRequestLogging();
 
     app.UseRouting();
 
