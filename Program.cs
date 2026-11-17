@@ -3,11 +3,17 @@ using Elastic.Ingest.Elasticsearch;
 using Elastic.Ingest.Elasticsearch.DataStreams;
 using Elastic.Serilog.Sinks;
 using Elastic.Transport;
+using OpenTelemetry.Resources;
 using Serilog;
 
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    
+    builder.Services.AddOpenTelemetry()
+        .ConfigureResource(r => r.AddService("Ave Maria"))
+        .WithLogging()
+        .UseOtlpExporter();
     
     Log.Logger = new LoggerConfiguration()
         .ReadFrom.Configuration(builder.Configuration)
