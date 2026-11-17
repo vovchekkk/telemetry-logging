@@ -1,14 +1,26 @@
-using Elastic.Channels;
-using Elastic.Ingest.Elasticsearch;
-using Elastic.Ingest.Elasticsearch.DataStreams;
-using Elastic.Serilog.Sinks;
-using Elastic.Transport;
-using Serilog;
+// using Elastic.Channels;
+// using Elastic.Ingest.Elasticsearch;
+// using Elastic.Ingest.Elasticsearch.DataStreams;
+// using Elastic.Serilog.Sinks;
+// using Elastic.Transport;
+using OpenTelemetry;
+using OpenTelemetry.Resources;
+// using Serilog;
 
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+
+    builder.Services.AddOpenTelemetry()
+        .ConfigureResource(r => r.AddService("RandomService"))
+        .WithLogging(null, o =>
+        {
+            o.IncludeFormattedMessage = true;
+            o.ParseStateValues = true;
+        })
+        .UseOtlpExporter();
     
+    /*
     Log.Logger = new LoggerConfiguration()
         .ReadFrom.Configuration(builder.Configuration)
         .WriteTo.Console()
@@ -33,14 +45,15 @@ try
         })
         .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
         .CreateLogger();
+    */
     
 
 // Add services to the container.
     builder.Services.AddRazorPages();
 
-    builder.Host.UseSerilog();
+    // builder.Host.UseSerilog();
 
-    builder.Services.AddSerilog(Log.Logger);
+    // builder.Services.AddSerilog(Log.Logger);
     /*
     builder.Services.AddSerilog((services, loggerConfiguration) =>
         loggerConfiguration
@@ -59,7 +72,7 @@ try
 
     app.UseHttpsRedirection();
     app.UseStaticFiles();
-    app.UseSerilogRequestLogging();
+    // app.UseSerilogRequestLogging();
 
     app.UseRouting();
 
@@ -71,9 +84,10 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "Host terminated unexpectedly");
+    // Log.Fatal(ex, "Host terminated unexpectedly");
+    Console.WriteLine(ex);
 }
-finally
-{
-    Log.CloseAndFlush();
-}
+// finally
+// {
+//     Log.CloseAndFlush();
+// }
